@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlixFinder - Netflix-Style Movie Details Finder</title>
+    <!-- Google Fonts: Inter for clean UI, Montserrat for bold titles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for beautiful modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <!-- Brand Logo with Netflix style typography -->
+            <div class="brand-logo" id="brand-logo">
+                <span class="logo-red">FLIX</span><span>FINDER</span>
+            </div>
+            <!-- Header actions (API key configuration & status) -->
+            <div class="header-actions">
+                <button class="icon-btn" id="settings-toggle-btn" title="API Settings">
+                    <i class="fas fa-cog"></i>
+                    <span class="btn-text">API Key</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Hero & Search Section -->
+        <section class="hero-section">
+            <div class="hero-bg-overlay"></div>
+            <div class="hero-content">
+                <h1 class="hero-title">Unlimited movie details, ratings, and more.</h1>
+                <p class="hero-subtitle">Search for any movie to discover its cast, release date, ratings, and plot details.</p>
+                
+                <!-- Movie Search Form -->
+                <form id="search-form" class="search-form" autocomplete="off">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Enter movie name (e.g., Inception, The Dark Knight...)"
+                            required
+                        >
+                        <button type="button" id="clear-search-btn" class="clear-btn" title="Clear search">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <button type="submit" id="search-submit-btn" class="search-submit-btn">
+                        <span>Search</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </form>
+
+                <!-- Popular Suggestions Pills -->
+                <div class="suggestions-container" id="suggestions-container">
+                    <span class="suggestions-label">Popular searches:</span>
+                    <div class="suggestion-pills">
+                        <button class="pill-btn" data-movie="Inception">Inception</button>
+                        <button class="pill-btn" data-movie="The Dark Knight">The Dark Knight</button>
+                        <button class="pill-btn" data-movie="Interstellar">Interstellar</button>
+                        <button class="pill-btn" data-movie="Avatar">Avatar</button>
+                        <button class="pill-btn" data-movie="Stranger Things">Stranger Things</button>
+                        <button class="pill-btn" data-movie="Wednesday">Wednesday</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Response Display Area -->
+        <section class="results-section">
+            <div class="container">
+                
+                <!-- LOADING STATE (Hidden by default) -->
+                <div id="loading-state" class="loading-state hidden">
+                    <div class="spinner-container">
+                        <div class="netflix-spinner"></div>
+                        <p class="loading-text">Fetching movie details from database...</p>
+                    </div>
+                    <!-- Skeleton Card Loading Animation -->
+                    <div class="skeleton-card">
+                        <div class="skeleton-poster"></div>
+                        <div class="skeleton-details">
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-badges">
+                                <div class="skeleton-badge"></div>
+                                <div class="skeleton-badge"></div>
+                                <div class="skeleton-badge"></div>
+                            </div>
+                            <div class="skeleton-line long"></div>
+                            <div class="skeleton-line medium"></div>
+                            <div class="skeleton-line short"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ERROR STATE (Hidden by default) -->
+                <div id="error-state" class="error-state hidden">
+                    <div class="error-card">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h2 id="error-title" class="error-title">Movie Not Found</h2>
+                        <p id="error-message" class="error-message">We couldn't find the movie you were looking for. Please check the spelling or try searching for another title.</p>
+                        <button class="retry-btn" id="error-retry-btn">Try Again</button>
+                    </div>
+                </div>
+
+                <!-- MOVIE DETAILS RESULT STATE (Hidden by default) -->
+                <div id="movie-details-container" class="movie-details-container hidden">
+                    <!-- Dynamic details will be loaded here by script.js -->
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings API Modal (Hidden by default) -->
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> OMDB API Configuration</h3>
+                <button class="close-modal-btn" id="close-modal-btn" title="Close configuration">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>The app is pre-configured with a default OMDB API Key. If the key expires or exceeds rate limits, you can replace it with your own key below.</p>
+                <div class="form-group">
+                    <label for="api-key-input">OMDB API Key</label>
+                    <div class="input-with-toggle">
+                        <input type="password" id="api-key-input" placeholder="Enter OMDB API Key">
+                        <button type="button" id="toggle-key-visibility" class="toggle-visibility-btn" title="Toggle Visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="reset-key-btn">Reset to Default</button>
+                    <button class="btn btn-primary" id="save-key-btn">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal Modern Footer -->
+    <footer class="app-footer">
+        <p>&copy; 2026 FlixFinder. Netflix-Style Movie Details Finder. Designed for study and exploration.</p>
+        <p class="footer-api-credit">Powered by <a href="http://www.omdbapi.com/" target="_blank" rel="noopener noreferrer">OMDB API</a></p>
+    </footer>
+
+    <!-- Custom JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
